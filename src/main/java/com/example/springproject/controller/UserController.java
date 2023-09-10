@@ -50,19 +50,15 @@ public class UserController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
-            System.out.println("loginRe"+loginRequest);
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
-            System.out.println("aa");
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                     .body(new UserInfoResponse(userDetails.getId(),
                             userDetails.getUsername(),

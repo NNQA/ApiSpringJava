@@ -16,12 +16,12 @@ import java.util.Set;
 
 @Service
 public class UserService implements IUserService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder encoder;
+    private  PasswordEncoder encoder;
+
 
 
     public UserService(UserRepository userRepository, RoleRepository roleRepository) {
@@ -37,7 +37,7 @@ public class UserService implements IUserService {
             throw new IllegalArgumentException("Email already exists");
         }
         Set<String> str = signupRequest.getRole();
-        Set<Role> roles = new HashSet<Role>();
+        Set<Role> roles = new HashSet<>();
 
         if (str == null) {
             Role userRole = roleRepository.findByName(Erole.ROLE_ADMIN)
@@ -48,14 +48,16 @@ public class UserService implements IUserService {
             str.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        System.out.println("admind" + role);
                         Role adminRole = roleRepository.findByName(Erole.ROLE_ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-
                         roles.add(adminRole);
                         break;
+                    case "supplier":
+                        Role supplierRole = roleRepository.findByName(Erole.ROLE_SUPPLIER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(supplierRole);
+                        break;
                     default:
-                        System.out.println("user" + role);
                         Role userRole = roleRepository.findByName(Erole.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
