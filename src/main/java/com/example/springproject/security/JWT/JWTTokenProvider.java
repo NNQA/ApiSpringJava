@@ -8,6 +8,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.Date;
 import java.security.Key;
+import java.util.HashMap;
+import java.util.Set;
 
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
@@ -58,6 +60,29 @@ public class JWTTokenProvider {
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
+    public Claims getAllClaimsFromToken(String token) {
+        Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(key())
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            claims = null;
+        }
+        return claims;
+    }
+    public Long getUserId(String token) {
+        Claims claims =  getAllClaimsFromToken(token);
+        Object idClaim = claims.get("id");
+        if (idClaim != null) {
+            if (idClaim instanceof Number) {
+                return ((Number) idClaim).longValue();
+            }
+        }
+        return  null;
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
@@ -79,7 +104,13 @@ public class JWTTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
+
+        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities());
+        claims.put("id", userDetails.getId());
+
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
