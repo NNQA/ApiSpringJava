@@ -28,6 +28,7 @@ public class ProductController {
         this.jwtUnit = jwtUnit;
     }
 
+
     @PostMapping("/addProduct")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPPLIER')")
     public ResponseEntity<?> addProduct(@RequestBody ProductRequest productRequest, HttpServletRequest request) {
@@ -60,6 +61,16 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }
 
+    }
+    @PutMapping("/approved/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public  ResponseEntity<?> approveProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.ApproveProduct(id);
+            return ResponseEntity.ok(new MessageResponse("Approved successfully" + product));
+        }  catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        }
     }
     @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
