@@ -4,9 +4,7 @@ import com.example.springproject.DTO.ProductDto;
 import com.example.springproject.Repository.CategoryRepostitory;
 import com.example.springproject.Repository.ProductRepository;
 import com.example.springproject.Repository.UserRepository;
-import com.example.springproject.models.Category;
-import com.example.springproject.models.Product;
-import com.example.springproject.models.User;
+import com.example.springproject.models.*;
 import com.example.springproject.payload.Request.ProductRequest;
 import com.example.springproject.payload.Response.ProductPageResponse;
 import com.example.springproject.security.service.Interface.IProductService;
@@ -16,9 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +47,13 @@ public class ProductService implements IProductService {
             throw new IllegalArgumentException("Category name cannot be null or empty.");
         }
 
-        Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice());
 
+        Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice());
+        if(user.getRoles().toString().contains("ROLE_ADMIN")) {
+            product.setApprove(true);
+        } else  {
+            product.setApprove(false);
+        }
         Category category = categoryRepostitory.findByName(productRequest.getNameCate())
                     .orElseThrow(()-> new RuntimeException("Cant found Category"));
         product.setCategory(category);
@@ -131,6 +132,16 @@ public class ProductService implements IProductService {
         Optional<Category> category = Optional.ofNullable(categoryRepostitory.findByName(cateName)
                 .orElseThrow(() -> new RuntimeException("can not found cate")));
         return productRepository.findAllByCategoryOrderByPriceDesc(category.get());
+    }
+
+    @Override
+    public Product ApproveProduct(Long id) {
+        Optional<Product> productOp = Optional.ofNullable(productRepository.findById(id).orElseThrow(() -> new RuntimeException("Cant found product to approved")));
+
+        Product product = productOp.get();
+        product.setApprove(true);
+
+        return productRepository.save(product);
     }
 
     @Override

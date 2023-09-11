@@ -20,6 +20,8 @@ public interface IProductService {
 
     List<Product> filterProducts(String cateName);
 
+    Product ApproveProduct(Long id);
+
     ProductPageResponse getALlProductPage(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 
 }
