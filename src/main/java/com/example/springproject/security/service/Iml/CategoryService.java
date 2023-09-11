@@ -1,25 +1,32 @@
 package com.example.springproject.security.service.Iml;
 
 import com.example.springproject.Repository.CategoryRepostitory;
+import com.example.springproject.Repository.UserRepository;
 import com.example.springproject.models.Category;
+import com.example.springproject.models.User;
 import com.example.springproject.payload.Request.CategoryRequest;
 import com.example.springproject.security.service.Interface.ICategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class CategoryService implements ICategoryService {
-    @Autowired
-    private CategoryRepostitory categoryRepostitory;
+    private final CategoryRepostitory categoryRepostitory;
+    private final UserRepository userRepository;
 
-    public CategoryService(CategoryRepostitory categoryRepostitory) {
+    public CategoryService(CategoryRepostitory categoryRepostitory, UserRepository userRepository) {
         this.categoryRepostitory = categoryRepostitory;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Category save(CategoryRequest categoryRequest) {
+    public Category save(CategoryRequest categoryRequest, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+        if(categoryRequest.getName() == null || Objects.equals(categoryRequest.getName(), "")) {
+            throw new RuntimeException("Category can not be null");
+        }
         Category category = new Category();
 
         category.setName(categoryRequest.getName());
@@ -30,7 +37,10 @@ public class CategoryService implements ICategoryService {
             parent.getChildren().add(category);
             categoryRepostitory.save(parent);
         }
-        return categoryRepostitory.save(category);
+        user.getCategory().add(category);
+        userRepository.save(user);
+
+        return category;
     }
     @Override
     public List<Category> GetAllChildrenOfParent(String name) {
@@ -44,5 +54,13 @@ public class CategoryService implements ICategoryService {
         Optional<Category> category = categoryRepostitory.findById(id);
         return  category
                 .orElseThrow(() -> new RuntimeException("Category not found witd Id: " + id));
+    }
+    @Override
+    public void Delete(Long id) {
+
+    }
+    @Override
+    public void DeleteAll() {
+        categoryRepostitory.deleteAll();
     }
 }
