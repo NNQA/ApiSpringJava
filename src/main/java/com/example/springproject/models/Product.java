@@ -28,6 +28,16 @@ public class Product {
     @ManyToOne
     private User user;
 
+    private boolean approve;
+
+    public boolean isApprove() {
+        return approve;
+    }
+
+    public void setApprove(boolean approve) {
+        this.approve = approve;
+    }
+
     public User getUser() {
         return user;
     }
