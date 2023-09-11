@@ -26,7 +26,8 @@ public class Category {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Product> product;
-
+    @ManyToMany
+    private Set<User> users;
     private String name;
 
     public Category() {
@@ -75,5 +76,13 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

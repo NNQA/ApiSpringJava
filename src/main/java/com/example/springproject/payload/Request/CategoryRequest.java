@@ -1,7 +1,12 @@
 package com.example.springproject.payload.Request;
 
+import org.springframework.lang.NonNull;
+
+import javax.validation.constraints.NotBlank;
+
 public class CategoryRequest {
     private String parentName;
+    @NotBlank
     private String name;
 
     public CategoryRequest(String parentName, String name) {
