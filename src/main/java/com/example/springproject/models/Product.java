@@ -3,7 +3,7 @@ package com.example.springproject.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.security.PrivateKey;
+import java.util.List;
 
 @Entity
 @Table(
@@ -15,28 +15,38 @@ public class Product {
     private long id;
 
     private String name;
-    private String decription;
+    private String description;
     private Double price;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(
             name = "category_id",
             nullable = false
     )
     private Category category;
 
-    public Product(long id, String name, String decription, Double price, Category category) {
+    @ManyToOne
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Product(long id, String name, String description, Double price, Category category) {
         this.id = id;
         this.name = name;
-        this.decription = decription;
+        this.description = description;
         this.price = price;
         this.category = category;
     }
 
-    public Product(String name, String decription, Double price) {
+    public Product(String name, String description, Double price) {
         this.name = name;
-        this.decription = decription;
+        this.description = description;
         this.price = price;
     }
 
@@ -60,12 +70,12 @@ public class Product {
         this.name = name;
     }
 
-    public String getDecription() {
-        return decription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDecription(String decription) {
-        this.decription = decription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Double getPrice() {

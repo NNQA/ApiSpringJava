@@ -7,12 +7,16 @@ import com.example.springproject.payload.Response.ProductPageResponse;
 import java.util.List;
 
 public interface IProductService {
-    Product save(ProductRequest productRequest);
+
+    Product save(ProductRequest productRequest, Long id);
+
     List<Product> getAllProduct();
     Product getByid(Long productId);
     Product updateProduct(Long productId,ProductRequest productRequest);
 
     void deteleProduct(Long productId);
+
+    void deleteAllProduct(Long id);
 
     List<Product> filterProducts(String cateName);
 

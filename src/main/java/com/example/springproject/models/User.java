@@ -1,7 +1,11 @@
 package com.example.springproject.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,7 +27,7 @@ public class User {
         this.password = password;
     }
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Category> category;
+    private Set<Category> category = new HashSet<>();
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns =@JoinColumn(name="user_id",referencedColumnName = "id"),
@@ -31,6 +35,9 @@ public class User {
     )
     private Set<Role> roles = new HashSet<Role>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Product> products;
     public User() {
 
     }
@@ -81,5 +88,13 @@ public class User {
 
     public void setCategory(Set<Category> category) {
         this.category = category;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

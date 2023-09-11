@@ -5,28 +5,36 @@ import com.example.springproject.models.Product;
 import com.example.springproject.payload.Request.ProductRequest;
 import com.example.springproject.payload.Response.MessageResponse;
 import com.example.springproject.payload.Response.ProductPageResponse;
+import com.example.springproject.security.JWT.JWTTokenProvider;
 import com.example.springproject.security.service.Iml.ProductService;
 import com.example.springproject.utils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
     private final ProductService productService;
+    private final JWTTokenProvider jwtUnit;
 
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, JWTTokenProvider jwtUnit) {
         this.productService = productService;
+        this.jwtUnit = jwtUnit;
     }
 
     @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody ProductRequest productRequest) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPPLIER')")
+    public ResponseEntity<?> addProduct(@RequestBody ProductRequest productRequest, HttpServletRequest request) {
         try {
-            Product product = productService.save(productRequest);
+            String token = jwtUnit.getJwtFromCookies(request);
+            Long id = jwtUnit.getUserId(token);
+            Product product = productService.save(productRequest, id);
             return ResponseEntity.ok(new MessageResponse("Product added successfully!"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
@@ -59,6 +67,18 @@ public class ProductController {
             productService.deteleProduct(id);
             System.out.println();
             return ResponseEntity.ok(new MessageResponse("Product with ID + " + id + " has been deleted successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        }
+    }
+    @DeleteMapping("/deleteAllProduct")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPPLIER')")
+    public ResponseEntity<?> deleteAllProduct(HttpServletRequest request) {
+        try {
+            String token = jwtUnit.getJwtFromCookies(request);
+            Long id = jwtUnit.getUserId(token);
+            productService.deleteAllProduct(id);
+            return ResponseEntity.ok(new MessageResponse("All products has been deleted successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }

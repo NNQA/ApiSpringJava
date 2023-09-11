@@ -3,12 +3,13 @@ package com.example.springproject.security.service.Iml;
 import com.example.springproject.DTO.ProductDto;
 import com.example.springproject.Repository.CategoryRepostitory;
 import com.example.springproject.Repository.ProductRepository;
+import com.example.springproject.Repository.UserRepository;
 import com.example.springproject.models.Category;
 import com.example.springproject.models.Product;
+import com.example.springproject.models.User;
 import com.example.springproject.payload.Request.ProductRequest;
 import com.example.springproject.payload.Response.ProductPageResponse;
 import com.example.springproject.security.service.Interface.IProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,14 +24,16 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService implements IProductService {
 
-    @Autowired
-    private CategoryRepostitory categoryRepostitory;
-    @Autowired
-    private ProductRepository productRepository;
 
-    public ProductService(CategoryRepostitory categoryRepostitory, ProductRepository productRepository) {
+    private final CategoryRepostitory categoryRepostitory;
+
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    public ProductService(CategoryRepostitory categoryRepostitory, ProductRepository productRepository, UserRepository userRepository) {
         this.categoryRepostitory = categoryRepostitory;
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     public ProductDto mapToProductDto(Product product) {
@@ -40,17 +43,23 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product save(ProductRequest productRequest) {
+    public Product save(ProductRequest productRequest, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+        System.out.println(user.getUsername());
         if(productRequest.getNameCate() == null || Objects.equals(productRequest.getNameCate(), "")) {
             throw new IllegalArgumentException("Category name cannot be null or empty.");
         }
+
         Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice());
 
         Category category = categoryRepostitory.findByName(productRequest.getNameCate())
                     .orElseThrow(()-> new RuntimeException("Cant found Category"));
         product.setCategory(category);
         category.getProduct().add(product);
-        categoryRepostitory.save(category);
+        product.setUser(user);
+        user.getProducts().add(product);
+        userRepository.save(user);
        return product;
     }
 
@@ -108,6 +117,13 @@ public class ProductService implements IProductService {
         else {
             throw new RuntimeException("Product not found with Id: " + productId);
         }
+    }
+    @Override
+    public void deleteAllProduct(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+        user.getProducts().clear();
+        userRepository.save(user);
     }
 
     @Override
