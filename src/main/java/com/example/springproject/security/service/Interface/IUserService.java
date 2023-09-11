@@ -5,4 +5,5 @@ import com.example.springproject.payload.Request.SignupRequest;
 
 public interface IUserService {
     User save(SignupRequest signupRequest);
+    void deleteAll();
 }

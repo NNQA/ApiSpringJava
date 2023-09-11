@@ -1,5 +1,6 @@
 package com.example.springproject.controller;
 
+import com.example.springproject.Repository.UserRepository;
 import com.example.springproject.payload.Request.LoginRequest;
 import com.example.springproject.payload.Request.SignupRequest;
 import com.example.springproject.payload.Response.MessageResponse;
@@ -75,5 +76,12 @@ public class UserController {
             return ResponseEntity.ok().header(
                     HttpHeaders.SET_COOKIE, responseCookie.toString()
             ).body(new MessageResponse("You've been signed out!"));
+    }
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delete() {
+
+        userService.deleteAll();
+        System.out.println("Adsa");
+        return ResponseEntity.ok().body(new MessageResponse("dont"));
     }
 }

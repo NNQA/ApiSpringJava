@@ -34,17 +34,8 @@ public class ProductService implements IProductService {
     }
 
     public ProductDto mapToProductDto(Product product) {
-//        ProductDto productDto =new ProductDto(
-//                product.getId(), product.getName(),product.getDecription(),product.getPrice(),product.getCategory()
-//        );
-//        ProductDto productDto = new ProductDto();
-//        productDto.setId(product.getId());
-//        productDto.setCategory(product.getCategory());
-//        productDto.setDecription(productDto.getDecription());
-//        productDto.setName(product.getName());
-//        productDto.setCategory(product.getCategory());
         return new ProductDto(
-                product.getId(), product.getName(),product.getDecription(),product.getPrice(),product.getCategory()
+                product.getId(), product.getName(),product.getDescription(),product.getPrice(),product.getCategory()
         );
     }
 
@@ -82,7 +73,7 @@ public class ProductService implements IProductService {
             try {
                 Product product = oddproduct.get();
                 product.setName(productRequest.getName());
-                product.setDecription(productRequest.getDescription());
+                product.setDescription(productRequest.getDescription());
                 product.setPrice(productRequest.getPrice());
                 if(!Objects.equals(product.getCategory().getName(), productRequest.getNameCate())) {
                     product.getCategory().getProduct().remove(product);
