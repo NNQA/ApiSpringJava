@@ -21,6 +21,7 @@ public interface IProductService {
     List<Product> filterProducts(String cateName);
 
     Product ApproveProduct(Long id);
+    String RejectProduct(Long userid, Long productId);
 
     ProductPageResponse getALlProductPage(Integer pageNo, Integer pageSize, String sortBy, String sortDir);
 

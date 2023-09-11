@@ -145,6 +145,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    public String RejectProduct(Long userId, Long productId) {
+        Optional<Product>  productOptional = Optional.ofNullable(
+                productRepository.findById(productId)
+                        .orElseThrow(() -> new RuntimeException("SomeThings are wrong with session and request"))
+        );
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+        productOptional.ifPresent(product -> user.getProducts().remove(product));
+        productOptional.ifPresent(productRepository::delete);
+        userRepository.save(user);
+        return "Succesfully";
+    }
+
+    @Override
     public ProductPageResponse getALlProductPage(Integer pageNo, Integer pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 

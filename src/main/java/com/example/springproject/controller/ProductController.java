@@ -72,6 +72,16 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }
     }
+    @DeleteMapping("/reject")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public  ResponseEntity<?> rejectProduct(@RequestParam Long userId, @RequestParam Long productId) {
+        try {
+            String a = productService.RejectProduct(userId, productId);
+            return ResponseEntity.ok(new MessageResponse(a + " is rejected"));
+        }  catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        }
+    }
     @DeleteMapping("/deleteProduct/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
