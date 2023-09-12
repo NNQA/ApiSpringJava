@@ -1,6 +1,7 @@
 package com.example.springproject.controller;
 
 import com.example.springproject.Repository.UserRepository;
+import com.example.springproject.models.User;
 import com.example.springproject.payload.Request.LoginRequest;
 import com.example.springproject.payload.Request.SignupRequest;
 import com.example.springproject.payload.Response.MessageResponse;
@@ -83,5 +84,10 @@ public class UserController {
         userService.deleteAll();
         System.out.println("Adsa");
         return ResponseEntity.ok().body(new MessageResponse("dont"));
+    }
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<?> getAllusers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok().body(users);
     }
 }

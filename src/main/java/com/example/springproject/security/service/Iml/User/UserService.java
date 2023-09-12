@@ -87,4 +87,9 @@ public class UserService implements IUserService {
         userRepository.deleteAll();
 
     }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 }

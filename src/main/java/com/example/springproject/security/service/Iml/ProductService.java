@@ -121,10 +121,20 @@ public class ProductService implements IProductService {
     }
     @Override
     public void deleteAllProduct(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
-        user.getProducts().clear();
-        userRepository.save(user);
+        Optional<User> userOp = Optional.ofNullable(userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error")));
+        User user = new User();
+        if(userOp.isPresent()) {
+            user = userOp.get();
+            List<Product> products = user.getProducts();
+            user.setProducts(null);
+            List<Product> newProducts = new ArrayList<>();
+
+            user.setProducts(newProducts);
+
+            userRepository.save(user);
+            productRepository.deleteAll(products);
+        }
     }
 
     @Override
