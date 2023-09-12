@@ -35,7 +35,7 @@ public class User {
     )
     private Set<Role> roles = new HashSet<Role>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Product> products;
     public User() {
