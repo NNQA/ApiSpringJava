@@ -103,12 +103,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }
     }
-    @PutMapping("/updateProduct/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id,@RequestBody ProductRequest productRequest) {
+    @PutMapping("/updateProduct/{productid}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPPLIER')")
+    public ResponseEntity<?> updateProduct(@PathVariable Long productid,@RequestBody ProductRequest productRequest, HttpServletRequest request) {
         try {
-            System.out.println(productRequest.getName() + productRequest.getPrice() + productRequest.getNameCate() +productRequest.getDescription());
-            productService.updateProduct(id,productRequest);
-            return ResponseEntity.ok(new MessageResponse("Product with ID + " + id + " has been updated successfully"));
+            String token = jwtUnit.getJwtFromCookies(request);
+            Long id = jwtUnit.getUserId(token);
+            String a = productService.updateProduct(id,productRequest, productid);
+            return ResponseEntity.ok(new MessageResponse("Product with ID + " + productid + a));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }

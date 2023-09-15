@@ -75,32 +75,26 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product updateProduct(Long productId, ProductRequest productRequest) {
-//        Optional<Product> oddproduct = productRepository.findById(productId);
-//        if(oddproduct.isPresent()) {
-//            try {
-//                Product product = oddproduct.get();
-//                product.setName(productRequest.getName());
-//                product.setDescription(productRequest.getDescription());
-//                product.setPrice(productRequest.getPrice());
-//                if(!Objects.equals(product.getCategory().getName(), productRequest.getNameCate())) {
-//                    product.getCategory().getProduct().remove(product);
-//                    categoryRepostitory
-//                            .save(product.getCategory());
-//                    Category category = categoryRepostitory.findByName(productRequest.getNameCate())
-//                            .orElseThrow(()-> new RuntimeException("Cant found Category"));
-//                    product.setCategory(category);
-//                }
-//                return productRepository.save(product);
-//            }
-//            catch (RuntimeException e) {
-//                throw new RuntimeException("An error occurred while saving the product");
-//            }
-//        }
-//        else {
-//            throw new RuntimeException("Product not found with Id: " + productId);
-//        }
-        return  null;
+    public String updateProduct(Long id, ProductRequest productRequest, Long productId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+
+        user.getProducts().stream()
+                .filter(p -> p.getId() == productId)
+                .findFirst()
+                .ifPresentOrElse(
+                        product -> {
+                            product.setName(productRequest.getName());
+                            product.setPrice(productRequest.getPrice());
+                            product.setDescription(productRequest.getDescription());
+                        },
+                        () -> {
+                            throw new RuntimeException("Product not found in user's products");
+                        }
+                );
+
+        userRepository.save(user);
+        return " has been updated successfully";
     }
 
     @Override

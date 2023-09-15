@@ -12,7 +12,7 @@ public interface IProductService {
 
     List<Product> getAllProduct();
     Product getByid(Long productId);
-    Product updateProduct(Long productId,ProductRequest productRequest);
+    String updateProduct(Long id,ProductRequest productRequest, Long productId);
 
     void deteleProduct(Long productId);
 
