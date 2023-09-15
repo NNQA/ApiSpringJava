@@ -3,6 +3,7 @@ package com.example.springproject.security.service.Iml;
 import com.example.springproject.Repository.CategoryRepostitory;
 import com.example.springproject.Repository.UserRepository;
 import com.example.springproject.models.Category;
+import com.example.springproject.models.Product;
 import com.example.springproject.models.User;
 import com.example.springproject.payload.Request.CategoryRequest;
 import com.example.springproject.security.service.Interface.ICategoryService;
@@ -21,9 +22,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Category save(CategoryRequest categoryRequest, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User dont exist or session error"));
+    public Category save(CategoryRequest categoryRequest) {
         if(categoryRequest.getName() == null || Objects.equals(categoryRequest.getName(), "")) {
             throw new RuntimeException("Category can not be null");
         }
@@ -37,8 +36,8 @@ public class CategoryService implements ICategoryService {
             parent.getChildren().add(category);
             categoryRepostitory.save(parent);
         }
-        user.getCategory().add(category);
-        userRepository.save(user);
+
+        categoryRepostitory.save(category);
 
         return category;
     }
@@ -50,6 +49,11 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    public List<Category> GetAllCategory() {
+        return categoryRepostitory.findAll();
+    }
+
+    @Override
     public Category getId(Long id) {
         Optional<Category> category = categoryRepostitory.findById(id);
         return  category
@@ -57,7 +61,8 @@ public class CategoryService implements ICategoryService {
     }
     @Override
     public void Delete(Long id) {
-
+        Optional<Category> category = categoryRepostitory.findById(id);
+        category.ifPresent(categoryRepostitory::delete);
     }
     @Override
     public void DeleteAll() {

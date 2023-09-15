@@ -67,6 +67,7 @@ public class WebconfigSecurityy {
                         auth
                                 .antMatchers("/api/auth/**").permitAll()
                                 .antMatchers("/api/product/**").permitAll()
+                                .antMatchers("/api/category/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
