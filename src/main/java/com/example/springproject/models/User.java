@@ -13,7 +13,7 @@ import java.util.Set;
         @UniqueConstraint(columnNames = {"username"}),
         @UniqueConstraint(columnNames = {"email"})
 })
-public class User {
+public class gUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
