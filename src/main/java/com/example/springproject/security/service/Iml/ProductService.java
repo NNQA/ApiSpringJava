@@ -46,22 +46,20 @@ public class ProductService implements IProductService {
         if(productRequest.getNameCate() == null || Objects.equals(productRequest.getNameCate(), "")) {
             throw new IllegalArgumentException("Category name cannot be null or empty.");
         }
-
-
-        Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice());
-        if(user.getRoles().toString().contains("ROLE_ADMIN")) {
-            product.setApprove(true);
-        } else  {
-            product.setApprove(false);
+        for (Product product: user.getProducts()) {
+            if (product.getName().contains(productRequest.getName())) {
+                throw new IllegalArgumentException("Name product have been exist, please choose another name");
+            }
         }
+        Product product = new Product(productRequest.getName(), productRequest.getDescription(), productRequest.getPrice());
+        product.setApprove(user.getRoles().toString().contains("ROLE_ADMIN"));
         Category category = categoryRepostitory.findByName(productRequest.getNameCate())
                     .orElseThrow(()-> new RuntimeException("Cant found Category"));
         product.setCategory(category);
-        category.getProduct().add(product);
         product.setUser(user);
         user.getProducts().add(product);
         userRepository.save(user);
-       return product;
+        return product;
     }
 
     @Override
@@ -78,30 +76,31 @@ public class ProductService implements IProductService {
 
     @Override
     public Product updateProduct(Long productId, ProductRequest productRequest) {
-        Optional<Product> oddproduct = productRepository.findById(productId);
-        if(oddproduct.isPresent()) {
-            try {
-                Product product = oddproduct.get();
-                product.setName(productRequest.getName());
-                product.setDescription(productRequest.getDescription());
-                product.setPrice(productRequest.getPrice());
-                if(!Objects.equals(product.getCategory().getName(), productRequest.getNameCate())) {
-                    product.getCategory().getProduct().remove(product);
-                    categoryRepostitory
-                            .save(product.getCategory());
-                    Category category = categoryRepostitory.findByName(productRequest.getNameCate())
-                            .orElseThrow(()-> new RuntimeException("Cant found Category"));
-                    product.setCategory(category);
-                }
-                return productRepository.save(product);
-            }
-            catch (RuntimeException e) {
-                throw new RuntimeException("An error occurred while saving the product");
-            }
-        }
-        else {
-            throw new RuntimeException("Product not found with Id: " + productId);
-        }
+//        Optional<Product> oddproduct = productRepository.findById(productId);
+//        if(oddproduct.isPresent()) {
+//            try {
+//                Product product = oddproduct.get();
+//                product.setName(productRequest.getName());
+//                product.setDescription(productRequest.getDescription());
+//                product.setPrice(productRequest.getPrice());
+//                if(!Objects.equals(product.getCategory().getName(), productRequest.getNameCate())) {
+//                    product.getCategory().getProduct().remove(product);
+//                    categoryRepostitory
+//                            .save(product.getCategory());
+//                    Category category = categoryRepostitory.findByName(productRequest.getNameCate())
+//                            .orElseThrow(()-> new RuntimeException("Cant found Category"));
+//                    product.setCategory(category);
+//                }
+//                return productRepository.save(product);
+//            }
+//            catch (RuntimeException e) {
+//                throw new RuntimeException("An error occurred while saving the product");
+//            }
+//        }
+//        else {
+//            throw new RuntimeException("Product not found with Id: " + productId);
+//        }
+        return  null;
     }
 
     @Override
@@ -123,17 +122,11 @@ public class ProductService implements IProductService {
     public void deleteAllProduct(Long id) {
         Optional<User> userOp = Optional.ofNullable(userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User dont exist or session error")));
-        User user = new User();
+        User user;
         if(userOp.isPresent()) {
             user = userOp.get();
-            List<Product> products = user.getProducts();
-            user.setProducts(null);
-            List<Product> newProducts = new ArrayList<>();
-
-            user.setProducts(newProducts);
-
+            user.getProducts().removeAll(user.getProducts());
             userRepository.save(user);
-            productRepository.deleteAll(products);
         }
     }
 
