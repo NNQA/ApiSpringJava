@@ -26,8 +26,6 @@ public class User {
         this.email = email;
         this.password = password;
     }
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Category> category = new HashSet<>();
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinTable(name = "user_roles",
             joinColumns =@JoinColumn(name="user_id",referencedColumnName = "id"),
@@ -80,14 +78,6 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public Set<Category> getCategory() {
-        return category;
-    }
-
-    public void setCategory(Set<Category> category) {
-        this.category = category;
     }
 
     public List<Product> getProducts() {

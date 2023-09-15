@@ -22,8 +22,6 @@ public class Category {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "parent")
     @JsonIgnore
     private Set<Category> children;
-    @ManyToMany
-    private Set<User> users;
     private String name;
 
     public Category() {
@@ -67,11 +65,4 @@ public class Category {
         this.name = name;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
 }
