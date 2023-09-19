@@ -7,6 +7,7 @@ import com.example.springproject.models.Category;
 import com.example.springproject.models.RecommendCategory;
 import com.example.springproject.models.User;
 import com.example.springproject.security.service.Interface.IRecommendSystemCategory;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,13 +28,17 @@ public class RecommendSystemCategoryService implements IRecommendSystemCategory 
 
     @Override
     public void fillCategorys(String nameUser, Category category) {
-        Optional<User> user = userRepository.findByUsername(nameUser);
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(nameUser)
+                .orElseThrow(() -> new RuntimeException("Cannot find user in my system!!!")));
 
-        RecommendCategory recommendCategory = recommendSystemCategoryRepository.findByUser(user.get());
+        RecommendCategory recommendCategory = new RecommendCategory();
+        if(user.isPresent()) {
+            recommendCategory = recommendSystemCategoryRepository.findByUser(user.get());
+        }
 
         if(recommendCategory == null) {
             HashMap<Long, Integer> map = new HashMap<>();
-            map.put(category.getId(), 0);
+            map.put(category.getId(), 1);
             recommendCategory = new RecommendCategory (
                     user.get() ,
                     map
@@ -65,7 +70,7 @@ public class RecommendSystemCategoryService implements IRecommendSystemCategory 
             for(Map.Entry<Long, Integer> map: recommendCategory.getCategoryValues().entrySet()) {
                 if(map.getValue() > 1) {
                     Optional<Category> category = categoryRepostitory.findById(map.getKey());
-                    categories.add(category.get());
+                    category.ifPresent(categories::add);
                 }
             }
             return categories;

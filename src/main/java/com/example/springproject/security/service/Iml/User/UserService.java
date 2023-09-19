@@ -41,7 +41,7 @@ public class UserService implements IUserService {
         if(userRepository.existsByEmail(signupRequest.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
-        Set<String> str = signupRequest.getRole();
+        Set<String> str = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
         if (str == null) {
