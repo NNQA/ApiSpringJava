@@ -18,6 +18,8 @@ public class Product {
     private String description;
     private Double price;
 
+    private Long quantity;
+
     @ManyToOne
     @JoinColumn(
             name = "category_id",
@@ -44,6 +46,14 @@ public class Product {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
     }
 
     public Product(long id, String name, String description, Double price, Category category) {
