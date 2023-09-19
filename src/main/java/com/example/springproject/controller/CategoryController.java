@@ -51,10 +51,10 @@ public class CategoryController {
     @GetMapping("/getCategory/{id}")
     public ResponseEntity<?> getCategory(@PathVariable Long id, HttpServletRequest request) {
         try {
-//            String token = jwtUtils.getJwtFromCookies(request);
-//            String name = jwtUtils.getUserNameFromJwtToken(token);
+            String token = jwtUtils.getJwtFromCookies(request);
+            String name = jwtUtils.getUserNameFromJwtToken(token);
             Category category = categoryService.getId(id);
-//            recommendSystemCategoryService.fillCategorys(name, category);
+            recommendSystemCategoryService.fillCategorys(name, category);
             return ResponseEntity.ok(category);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
@@ -68,7 +68,6 @@ public class CategoryController {
             return ResponseEntity.ok("Deletion successful");
         }
         catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Deletion failed: " + e.getMessage());
         }
     }
