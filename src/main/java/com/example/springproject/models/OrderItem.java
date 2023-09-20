@@ -13,7 +13,7 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-    private int quantity;
+    private Long quantity;
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Oder order;
@@ -29,7 +29,7 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    public OrderItem(Long id, Product product, int quantity, Oder order) {
+    public OrderItem(Long id, Product product, Long quantity, Oder order) {
         this.id = id;
         this.product = product;
         this.quantity = quantity;
@@ -52,11 +52,11 @@ public class OrderItem {
         this.product = product;
     }
 
-    public int getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 }

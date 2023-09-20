@@ -6,9 +6,9 @@ import com.example.springproject.models.Product;
 public class OrderItemDTO {
 
     private String nameProduct;
-    private int quantity;
+    private Long quantity;
 
-    public OrderItemDTO(String nameProduct, int quantity) {
+    public OrderItemDTO(String nameProduct, Long quantity) {
         this.nameProduct = nameProduct;
         this.quantity = quantity;
     }
@@ -21,11 +21,11 @@ public class OrderItemDTO {
         this.nameProduct = nameProduct;
     }
 
-    public int getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 }

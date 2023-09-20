@@ -1,6 +1,7 @@
 package com.example.springproject.controller;
 
 
+import com.example.springproject.payload.Request.OrderItemRequest;
 import com.example.springproject.payload.Response.MessageResponse;
 import com.example.springproject.payload.Response.OrderDetails;
 import com.example.springproject.security.JWT.JWTTokenProvider;
@@ -42,6 +43,17 @@ public class OrderController {
             Long id = jwtUils.getUserId(token);
             OrderDetails orderDetails = orderService.getOrderDetails(id);
             return ResponseEntity.ok(orderDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        }
+    }
+    @PutMapping("/udapteOrderitem/{orderId}")
+    public ResponseEntity<?> updateOrderItem(@PathVariable Long orderId,@RequestBody OrderItemRequest orderItemRequest, HttpServletRequest request) {
+        try {
+            String token = jwtUils.getJwtFromCookies(request);
+            Long id = jwtUils.getUserId(token);
+            orderService.updateOrderItem(orderId,id, orderItemRequest);
+            return ResponseEntity.ok("ok");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }

@@ -9,6 +9,7 @@ import com.example.springproject.models.Oder;
 import com.example.springproject.models.OrderItem;
 import com.example.springproject.models.Product;
 import com.example.springproject.models.User;
+import com.example.springproject.payload.Request.OrderItemRequest;
 import com.example.springproject.payload.Response.OrderDetails;
 import com.example.springproject.security.service.Interface.IOrderService;
 import org.jetbrains.annotations.NotNull;
@@ -94,5 +95,23 @@ public class OrderService implements IOrderService {
             return new OrderDetails(oder1.get().getUser().getUsername(), orderItemDTOS);
         }
         return new OrderDetails(null, null);
+    }
+
+    @Override
+    public void updateOrderItem(Long oderId,Long userId, OrderItemRequest orderItemRequest) {
+        Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
+        Optional<Oder> oder = orderRepository.findById(oderId);
+        if(oder.isPresent()) {
+            oder.get().getOrderItems().stream().filter(orderItem -> orderItem.getProduct().getId() == orderItemRequest.getProductId())
+                    .findFirst()
+                    .ifPresentOrElse(
+                            orderItem -> {
+                                orderItem.setQuantity(orderItemRequest.getQuantity());
+                            },
+                            () -> new RuntimeException("Cannot found item in order")
+                    );
+            orderRepository.save(oder.get());
+        }
+
     }
 }
