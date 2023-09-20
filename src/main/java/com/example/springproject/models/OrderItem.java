@@ -18,6 +18,23 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Oder order;
 
+    public Oder getOrder() {
+        return order;
+    }
+
+    public void setOrder(Oder order) {
+        this.order = order;
+    }
+
+    public OrderItem() {
+    }
+
+    public OrderItem(Long id, Product product, int quantity, Oder order) {
+        this.id = id;
+        this.product = product;
+        this.quantity = quantity;
+        this.order = order;
+    }
 
     public Long getId() {
         return id;

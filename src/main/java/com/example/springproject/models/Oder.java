@@ -18,6 +18,21 @@ public class Oder {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    private boolean checkout = false;
+
+    public boolean isCheckout() {
+        return checkout;
+    }
+
+    public void setCheckout(boolean checkout) {
+        this.checkout = checkout;
+    }
+
+    public Oder(User user, List<OrderItem> orderItems) {
+        this.user = user;
+        this.orderItems = orderItems;
+    }
+
 
     public List<OrderItem> getOrderItems() {
         return orderItems;
@@ -50,5 +65,13 @@ public class Oder {
 
     public void setUser(User user) {
         this.user = user;
+    }
+    public Oder addItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        return this;
+    }
+    public Oder addUser(User user) {
+        this.setUser(user);
+        return this;
     }
 }
