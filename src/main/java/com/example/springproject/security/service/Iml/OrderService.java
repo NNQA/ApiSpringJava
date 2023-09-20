@@ -14,6 +14,8 @@ import com.example.springproject.payload.Response.OrderDetails;
 import com.example.springproject.security.service.Interface.IOrderService;
 import org.cache2k.CacheManager;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -106,6 +108,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+//    @Cacheable(cacheNames = "orderCaching", key = "#userId")
     public void updateOrderItem(Long oderId,Long userId, OrderItemRequest orderItemRequest) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
         Optional<Oder> oder = orderRepository.findById(oderId);
@@ -124,11 +127,31 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Cacheable(cacheNames = "orderCaching", key = "#userId")
     public void checkout(Long orderId, Long userId) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
         Optional<Oder> oder = orderRepository.findById(orderId);
         oder.ifPresent(oder1 -> oder1.setCheckout(true));
         orderRepository.save(oder.get());
+    }
 
+    @Override
+    @CacheEvict(cacheNames = "orderCaching", key = "#userId")
+    public void deleteItem(Long oderId, Long itemId, Long userId) {
+        Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
+        Optional<Oder> oder = orderRepository.findById(oderId);
+
+        oder.ifPresent(value -> value.getOrderItems()
+                .stream()
+                .filter(
+                        orderItem -> orderItem.getId() == itemId
+                ).findFirst().ifPresentOrElse(
+                orderItem -> {
+                    orderItemRepository.delete(orderItem);
+                    value.getOrderItems().remove(orderItem);
+                },
+                () -> new RuntimeException("Cannot delete OrderItem")
+        ));
+        orderRepository.save(oder.get());
     }
 }

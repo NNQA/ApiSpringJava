@@ -70,4 +70,17 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }
     }
+    @DeleteMapping("/deleteItem/{orderId}")
+    public ResponseEntity<?> deleteItem(@PathVariable Long orderId,@RequestParam Long itemId, HttpServletRequest request) {
+        try {
+            String token = jwtUils.getJwtFromCookies(request);
+            Long id = jwtUils.getUserId(token);
+            orderService.deleteItem(orderId, itemId, id);
+
+            return ResponseEntity.ok("Delete Successfully");
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        }
+    }
 }

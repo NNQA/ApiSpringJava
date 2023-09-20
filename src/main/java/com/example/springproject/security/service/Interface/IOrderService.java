@@ -10,4 +10,5 @@ public interface IOrderService {
     OrderDetails getOrderDetails(Long userId);
     void updateOrderItem(Long orderId, Long userId, OrderItemRequest orderItemRequest);
     void checkout(Long orderId, Long userId);
+    void deleteItem(Long oderId, Long itemId, Long userId);
 }
