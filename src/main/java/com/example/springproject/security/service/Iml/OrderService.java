@@ -1,5 +1,6 @@
 package com.example.springproject.security.service.Iml;
 
+import com.example.springproject.DTO.OrderItemDTO;
 import com.example.springproject.Repository.OrderItemRepository;
 import com.example.springproject.Repository.OrderRepository;
 import com.example.springproject.Repository.ProductRepository;
@@ -8,6 +9,7 @@ import com.example.springproject.models.Oder;
 import com.example.springproject.models.OrderItem;
 import com.example.springproject.models.Product;
 import com.example.springproject.models.User;
+import com.example.springproject.payload.Response.OrderDetails;
 import com.example.springproject.security.service.Interface.IOrderService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -72,5 +74,25 @@ public class OrderService implements IOrderService {
                 orderRepository.save(order);
             }
         }
+    }
+
+    @Override
+    public OrderDetails getOrderDetails(Long userId) {
+        Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
+        Optional<List<Oder>> order = Optional.empty();
+        if(user.isPresent()) {
+            order = orderRepository.findAllByUser(user.get());
+
+        }
+        Optional<Oder> oder1 = order.get().stream().reduce((f, s) -> s);
+        if(!oder1.get().isCheckout()) {
+            List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
+            oder1.get().getOrderItems().forEach(orderItem -> {
+                System.out.println(orderItem.getProduct().getName());
+                orderItemDTOS.add(new OrderItemDTO(orderItem.getProduct().getName(), orderItem.getQuantity()));
+            });
+            return new OrderDetails(oder1.get().getUser().getUsername(), orderItemDTOS);
+        }
+        return new OrderDetails(null, null);
     }
 }
