@@ -12,7 +12,9 @@ import com.example.springproject.models.User;
 import com.example.springproject.payload.Request.OrderItemRequest;
 import com.example.springproject.payload.Response.OrderDetails;
 import com.example.springproject.security.service.Interface.IOrderService;
+import org.cache2k.CacheManager;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.Optional;
 @Service
 public class OrderService implements IOrderService {
 
+    private CacheManager cacheManager;
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
 
@@ -52,6 +55,7 @@ public class OrderService implements IOrderService {
             Oder order = new Oder().addItem(orderItem).addUser(user.get());
 
             orderItem.setOrder(order);
+            orderItem.setQuantity(Long.valueOf(0));
             orderRepository.save(order);
         } else {
             if (!Objects.requireNonNull(oder.get().stream().reduce((first, second) -> second)
@@ -72,13 +76,16 @@ public class OrderService implements IOrderService {
                 Oder order = new Oder().addItem(orderItem).addUser(user.get());
 
                 orderItem.setOrder(order);
+                orderItem.setQuantity(Long.valueOf(0));
                 orderRepository.save(order);
             }
         }
     }
 
     @Override
+    @Cacheable(cacheNames = "orderCaching", key = "#userId")
     public OrderDetails getOrderDetails(Long userId) {
+        System.out.println("Cache hit for userId: " + userId);
         Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
         Optional<List<Oder>> order = Optional.empty();
         if(user.isPresent()) {
@@ -92,6 +99,7 @@ public class OrderService implements IOrderService {
                 System.out.println(orderItem.getProduct().getName());
                 orderItemDTOS.add(new OrderItemDTO(orderItem.getProduct().getName(), orderItem.getQuantity()));
             });
+
             return new OrderDetails(oder1.get().getUser().getUsername(), orderItemDTOS);
         }
         return new OrderDetails(null, null);
@@ -112,6 +120,15 @@ public class OrderService implements IOrderService {
                     );
             orderRepository.save(oder.get());
         }
+
+    }
+
+    @Override
+    public void checkout(Long orderId, Long userId) {
+        Optional<User> user = Optional.ofNullable(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Cannot found user or session login fail")));
+        Optional<Oder> oder = orderRepository.findById(orderId);
+        oder.ifPresent(oder1 -> oder1.setCheckout(true));
+        orderRepository.save(oder.get());
 
     }
 }
