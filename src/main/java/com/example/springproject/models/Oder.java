@@ -20,6 +20,7 @@ public class Oder {
 
     private boolean checkout = false;
 
+
     public boolean isCheckout() {
         return checkout;
     }

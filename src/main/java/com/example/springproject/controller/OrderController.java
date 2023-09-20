@@ -32,7 +32,7 @@ public class OrderController {
         String token = jwtUils.getJwtFromCookies(request);
         Long id = jwtUils.getUserId(token);
         orderService.addOrder(idProduct, id);
-        return ResponseEntity.ok("asdsad");
+        return ResponseEntity.ok("ok");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
         }
